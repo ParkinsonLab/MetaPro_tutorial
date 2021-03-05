@@ -33,6 +33,7 @@ Rather than use the entire set of 25 million read, which might take several days
 
 **Note**
 The purpose of this tutorial is to demonstrate MetaPro's various steps.  The pipeline is fully capable of running all of the steps without the intervention of the user beyond an initial call to the program.  If you wish to simply use MetaPro, do not use the --tutorial option.
+This tutorial also assumes that the pipeline files are contained in a directory
 
 ## Preliminaries
 
@@ -45,7 +46,7 @@ https://www.docker.com/products/docker-desktop
 If you are running the tutorial on a computing cluster environment, your admin may already have Singularity installed.  For the purposes of this tutorial, Docker is equivalent to Singularity.
 Next, pull the MetaPro docker image
 ```
-docker pull parkinsonlab/metapro:tutorial
+docker pull parkinsonlab/metapro:develop
 ```
 OR
 ```
@@ -195,11 +196,20 @@ To read the HTML report file, open it in a web browser (such as FireFox).  Then 
 ### Step 1: Remove adapter sequences, trim low quality sequences, and remove duplicate reads. 
 For the first step, MetaPro removes adaptor sequences, trims low-quality reads, and removes duplicate reads in one pass.
 ```
+The format is:
 read1='<path to input sequence>'
 config='<path to config file>'
 output='<path to output folder>'
 python3 /pipeline/MetaPro.py -c $config -s $read1 -o $output --tutorial quality
 ```
+The commands would look like:
+```
+read1=/home/billy/mpro_tutorial/mouse1.fastq
+config=/home/billy/mpro_tutorial/config_mouse.ini
+output=/home/billy/mpro_tutorial/mouse1_run
+python3 /pipeline/MetaPro.py -c $config -s $read1 -o $output --tutorial quality
+```
+
 
 **Notes**:
 All MetaPro steps share the same file directory scheme:
@@ -297,6 +307,13 @@ config='<path to config file>'
 output='<path to output folder>'
 python3 /pipeline/MetaPro.py -c $config -s $read1 -o $output --tutorial vector
 ```
+The commands would look like:
+```
+read1=/home/billy/mpro_tutorial/mouse1_run/quality_filter/final_results/singletons.fastq
+config=/home/billy/mpro_tutorial/config_mouse.ini
+output=/home/billy/mpro_tutorial/mouse1_run
+python3 /pipeline/MetaPro.py -c $config -s $read1 -o $output --tutorial vector
+```
 
 MetaPro will automatically run the following:
 
@@ -385,6 +402,14 @@ output='<path to output folder>'
 python3 /pipeline/MetaPro.py -c $config -s $read1 -o $output --tutorial host
 ```
 
+The commands would look like:
+```
+read1=/home/billy/mpro_tutorial/mouse1_run/vector_read_filter/final_results/singletons.fastq
+config=/home/billy/mpro_tutorial/config_mouse.ini
+output=/home/billy/mpro_tutorial/mouse1_run
+python3 /pipeline/MetaPro.py -c $config -s $read1 -o $output --tutorial host
+```
+
 This call will perform the following steps:
 - Prepare the host database for alignment (BWA + BLAT)
 - perform alignment using BWA
@@ -430,10 +455,10 @@ MetaPro will perform the following:
 - collect all of the data pieces (Barrnap mRNA, Infernal mRNA) into mRNA, and "other"
 
 By running things this way, the rRNA step takes 4 minutes(as recorded with a 40-core computing node with 200 GB RAM, and an rRNA chunksize of 1000 reads), but it requires significant computing power, memory, and storage space, not available on a typical desktop PC.
-
+If you were to run this on your own, you will need the RFam database.
 The call to MetaPro would be:
 ```
--NOTE: example only.  do not run for the tutorial
+-NOTE: example form.
 
 read1='<path to your host filter final results mouse.fastq>'
 config='<path to config file>'
@@ -441,6 +466,13 @@ output='<path to output folder>'
 python3 /pipeline/MetaPro.py -c $config -s $read1 -o $output --tutorial rRNA
 ```
 
+The command would look like:
+```
+read1=/home/billy/mpro_tutorial/mouse1_run/host_read_filter/final_results/singletons.fastq
+config=/home/billy/mpro_tutorial/config_mouse.ini
+output=/home/billy/mpro_tutorial/mouse1_run
+python3 /pipeline/MetaPro.py -c $config -s $read1 -o $output --tutorial rRNA
+```
 
 instead, we have provided you with the results.
 ``` 
@@ -460,6 +492,14 @@ After removing contaminants, host sequences, and rRNA, we need to replace the pr
 read1='<path to your rRNA filter final results mouse.fastq>'
 config='<path to config file>'
 output='<path to output folder>'
+python3 /pipeline/MetaPro.py -c $config -s $read1 -o $output --tutorial repop
+```
+
+The command would look like:
+```
+read1=/home/billy/mpro_tutorial/mouse1_run/rRNA_filter/final_results/mRNA/singletons.fastq
+config=/home/billy/mpro_tutorial/config_mouse.ini
+output=/home/billy/mpro_tutorial/mouse1_run
 python3 /pipeline/MetaPro.py -c $config -s $read1 -o $output --tutorial repop
 ```
 
@@ -485,8 +525,16 @@ read1='<path to your rereplicated mRNA final results mouse.fastq>'
 config='<path to config file>'
 output='<path to output folder>'
 python3 /pipeline/MetaPro.py -c $config -s $read1 -o $output --tutorial contigs
-
 ```
+The command would look like:
+```
+read1=/home/billy/mpro_tutorial/mouse1_run/duplicate_repopulation/final_results/singletons.fastq
+config=/home/billy/mpro_tutorial/config_mouse.ini
+output=/home/billy/mpro_tutorial/mouse1_run
+python3 /pipeline/MetaPro.py -c $config -s $read1 -o $output --tutorial contigs
+```
+
+
 **Notes**:
 In this step, MetaPro does the following:
 -   Assemble the reads into contigs using SPAdes
@@ -544,6 +592,16 @@ output='<path to output folder>'
 python3 /pipeline/MetaPro.py -c $config -s $read1 --contig $contig -o $output --tutorial GA
 ```
 
+The command would look like:
+```
+read1=/home/billy/mpro_tutorial/mouse1_run/assemble_contigs/final_results/singletons.fastq
+contig=/home/billy/mpro_tutorial/mouse1_run/assemble_contigs/final_results/contigs.fasta
+config=/home/billy/mpro_tutorial/config_mouse.ini
+output=/home/billy/mpro_tutorial/mouse1_run
+python3 /pipeline/MetaPro.py -c $config -s $read1 --contig $contig -o $output --tutorial GA
+```
+
+
 
 **Notes**:
 -   The gene annotation step will create 4 different subdirectories: GA_BWA, GA_BLAT, GA_DIAMOND, and GA_FINAL_MERGE
@@ -570,68 +628,6 @@ python3 /pipeline/MetaPro.py -c $config -s $read1 --contig $contig -o $output --
     
 -   Unless you are running this tutorial on a computing cluster, most systems do not have enough memory to handle indexing or searching large databases like `ChocoPhlan` (19GB) and `nr` (>60GB). The descriptions in this section are purely for your information. Please use our precomputed gene, protein, and read mapping files from the tar file `tar -xzf precomputed_files.tar.gz mouse1_genes_map.tsv mouse1_genes.fasta mouse1_proteins.fasta`
 
-
-
-**BWA searches against microbial genome database**
-
--  If you were to run BWA yourself, you would use the following commands to search the `microbial_all_cds.fasta` database:
-   -  `bwa mem -t 4 microbial_all_cds.fasta mouse1_contigs.fasta > mouse1_contigs_annotation_bwa.sam`
-   -  `bwa mem -t 4 microbial_all_cds.fasta mouse1_unassembled.fasta > mouse1_unassembled_annotation_bwa.sam`
-
-Then you would run the following python script to extract high confidence alignments to the `microbial_all_cds.fasta` database and generate a read to gene mapping table. Here we are only taking one gene per contig, but it is possible that contigs may have more than one genes (e.g. co-transcribed genes).
-
--  `./6_BWA_Gene_Map.py microbial_all_cds.fasta mouse1_contigs_map.tsv mouse1_genes_map.tsv mouse1_genes.fasta mouse1_contigs.fasta mouse1_contigs_annotation_bwa.sam mouse1_contigs_unmapped.fasta mouse1_unassembled.fastq mouse1_unassembled_annotation_bwa.sam mouse1_unassembled_unmapped.fasta`
-
-The argument structure for this script is:
-
--  `6_BWA_Gene_Map.py <Gene_database> <Contig_Map> <Output_File_For_Gene_Map> <Output_File_For_Gene_sequences> <Contigs_File> <Contig_BWA_SAM> <Unmapped_Contigs> <Unassembled_Reads_File> <Unassembled_Reads_BWA_SAM> <Unmapped_Unassembled_Reads>`
-
-**DIAMOND against the non-redundant (NR) protein DB**
-
-DIAMOND is a BLAST-like local aligner for mapping translated DNA query sequences against a protein reference database (BLASTX alignment mode). The speedup over BLAST is up to 20,000 on short reads at a typical sensitivity of 90-99% relative to BLAST depending on the data and settings. However, searching time for the nr database is still long (timing scales primarily by size of reference database for small numbers of reads).
-
--  If you were to run DIAMOND yourself, you would use the following commands:
-   -   `mkdir -p dmnd_tmp`
-   -   `diamond blastx -p 4 -d nr -q mouse1_contigs_unmapped.fasta -o mouse1_contigs.dmdout -f 6 -t dmnd_tmp -k 10 --id 85 --query-cover 65 --min-score 60`
-   -   `diamond blastx -p 4 -d nr -q mouse1_unassembled_unmapped.fasta -o mouse1_unassembled.diamondout -f 6 -t dmnd_tmp -k 10 --id 85 --query-cover 65 --min-score 60`
--   The command line parameters are:
-    -   `-p`: Number of threads to use in the search is 4.
-    -   `-q`: Input file name.
-    -   `-d`: Database name.
-    -   `-e`: Expectation value (E) threshold for saving hits.
-    -   `-k`: Maximum number of aligned sequences to keep is 10.
-    -   `-t`: Temporary folder.
-    -   `-o`: Output file name.
-    -   `-f`: Output file is in a tabular format.
-
-From the output of these searches, you would need to extract the top matched proteins using the script below. Here we consider a match if 85% sequence identity over 65% of the read length - this can result in very poor e-values (E = 3!) but the matches nonetheless appear reasonable.
-
--  `./7_Diamond_Protein_Map.py nr mouse1_contigs_map.tsv mouse1_genes_map.tsv mouse1_proteins.fasta mouse1_contigs_unmapped.fasta mouse1_contigs.dmdout mouse1_contigs_unannotated.fasta mouse1_unassembled_unmapped.fasta mouse1_unassembled.dmdout mouse1_unassembled_unannotated.fasta`
-
-The argument structure for this script is:
-
--  `7_Diamond_Protein_Map.py <Protein_database> <Contig_Map> <Gene_Map> <Output_File_For_Protein_sequences> <Unmapped_Contigs_File> <Contig_Diamond_Output> <Output_For_Unannotated_Contigs> <Unmapped_ Unassembled_Reads_File> <Unassembled_Reads_Diamond_Output> <Output_For_Unannotated_Unassembled_Reads>`
-
-Because the non-redundant protein database contains entries from many species, including eukaryotes, we often find that sequence reads can match multiple protein with the same score. From these multiple matches, we currently select the first (i.e. 'top hit'). As mentioned in the metagenomics lecture, more sophisticated algorithms could be applied, however our current philosophy is that proteins sharing the same sequence match are likely to possess similar functions in any event; taxonomy is a separate issue however!
-
-<!--
-***Question 13: How many reads were mapped in each step? How many genes were the reads mapped to? How many proteins were the genes mapped to?***
--->
--   Total number of mapped-reads with BWA = 3356 reads
--   Total number of mapped genes (BWA) = 1234
--   Total number of mapped-reads with DIAMOND = 51936 reads
--   Total number of mapped proteins (DIAMOND) = 21699
-
-Thus of ~83000 reads of putative microbial mRNA origin, we can annotate ~55000 of them to almost ~23000 genes!
-
-Remember, to extract the precomputed output files for this step:
-
-```
-Run this one!  
-tar -xzf precomputed_files.tar.gz mouse1_genes_map.tsv mouse1_genes.fasta mouse1_proteins.fasta
-```
-
-
 ### Step 9. Taxonomic Classification
 
 Now that we have putative mRNA transcripts, we can begin to infer the origins of our mRNA reads. Firstly, we will attempt to use a reference based short read classifier to infer the taxonomic orgin of our reads. Here we will use [Kaiju] (https://github.com/bioinformatics-centre/kaiju), [Centrifuge](https://ccb.jhu.edu/software/centrifuge/manual.shtml), and our Gene Annotation results to generate taxonomic classifications for our reads based on a reference database. 
@@ -652,6 +648,16 @@ config='<path to config file>'
 output='<path to output folder>'
 python3 /pipeline/MetaPro.py -c $config -s $read1 --contig $contig -o $output --tutorial TA
 ```
+The command would look like:
+```
+read1=/home/billy/mpro_tutorial/mouse1_run/assemble_contigs/final_results/singletons.fastq
+contig=/home/billy/mpro_tutorial/mouse1_run/assemble_contigs/final_results/contigs.fasta
+config=/home/billy/mpro_tutorial/config_mouse.ini
+output=/home/billy/mpro_tutorial/mouse1_run
+python3 /pipeline/MetaPro.py -c $config -s $read1 --contig $contig -o $output --tutorial TA
+```
+
+
 
 Instead, we have provided the results here:
 
@@ -659,62 +665,19 @@ Instead, we have provided the results here:
 tar --wildcards -xzf precomputed_files.tar.gz kaiju*
 chmod +x kaiju*
 tar -xzf precomputed_files.tar.gz mouse1_classification.tsv nodes.dmp names.dmp
-```
-
-**Notes**:
-
--   The kaiju command you would use is given below:
-    -   `kaiju -t nodes.dmp -f kaiju_db.fmi -i mouse1_mRNA.fastq -z 4 -o mouse1_classification.tsv`
--   The command line parameters are:
-    -   `-t`: The hierarchal representation of the taxonomy IDs
-    -   `-f`: The precomputed index for kaiju
-    -   `-i`: The input reads
-    -   `-z`: The number of threads supported on your system
-    -   `-o`: The output file for the kaiju taxonomic classifications
-
-We can then take the classified reads and perform supplemental analyses. Firstly, we'll restrict the specificity of the classifications to Genus-level taxa which limits the number of spurious classifications.
 
 ```
-./4_Constrain_Classification.py genus mouse1_classification.tsv nodes.dmp names.dmp mouse1_classification_genus.tsv
-```
+We can use [Krona] (https://github.com/marbl/Krona/wiki) to generate a hierarchical multi-layered pie chart summary of the taxonomic composition of our dataset.
 
-**Notes**:
-
-The argument structure for this script is:
-`4_Constrain_Classification.py <Minimum_Taxonomic_Rank> <kaiju_Classification> <nodes_file> <names_file> <Output_Classifications>`
-
-Then we generate a human readable summary of the classification using Kaiju.
+To use Krona, the export of MetaPro's taxonomic annotations need to be appended
 
 ```
-/pipeline_tools/kaiju/kaijuReport -t nodes.dmp -n names.dmp -i mouse1_classification_genus.tsv -o mouse1_classification_Summary.txt -r genus
-```
-
-**Notes**:
-
--   The command line parameters are:
-    -   `-t`: The hierarchal representation of the taxonomy IDs
-    -   `-n`: The taxonomic names corresponding to each taxonomy ID
-    -   `-i`: The kaiju taxonomic classifications
-    -   `-o`: The summary report output file
-    -   `-r`: The taxonomic rank for which the summary will be produced
-
-<!-- ***Question 9: How many reads did kaiju classify?*** -->
-
-Lastly, we will use [Krona] (https://github.com/marbl/Krona/wiki) to generate a hierarchical multi-layered pie chart summary of the taxonomic composition of our dataset.
-
-To use Krona, the export of MetaPro's taxonomic annotation needs to be appended
-
-```
-python3 /pipeline/Scripts/alter_taxa_for_krona.py <> <>
+python3 /pipeline/Scripts/alter_taxa_for_krona.py <taxonomic_classifications.tsv> <for_krona.tsv>
 /pipeline_tools/kaiju/kaiju2krona -t nodes.dmp -n names.dmp -i mouse1_classification_genus.tsv -o mouse1_classification_Krona.txt
 /pipeline_tools/KronaTools/scripts/ImportText.pl -o mouse1_classification.html mouse1_classification_Krona.txt
 ```
 
-We can then view this pie chart representation of our dataset using a web browser:
-
-```
-firefox mouse1_classification.html
-```
+We can then view this pie chart representation of our dataset using a web browser
 
 <!-- 
 ***Question 10: What is the most abundant family in our dataset? What is the most abundant phylum?  
@@ -743,6 +706,15 @@ read1='<path to your unassembled singletons.fastq>'
 contig='<path to your contigs.fasta>'
 config='<path to config file>'
 output='<path to output folder>'
+python3 /pipeline/MetaPro.py -c $config -s $read1 --contig $contig -o $output --tutorial EC
+```
+
+The command would look like:
+```
+read1=/home/billy/mpro_tutorial/mouse1_run/assemble_contigs/final_results/singletons.fastq
+contig=/home/billy/mpro_tutorial/mouse1_run/assemble_contigs/final_results/contigs.fasta
+config=/home/billy/mpro_tutorial/config_mouse.ini
+output=/home/billy/mpro_tutorial/mouse1_run
 python3 /pipeline/MetaPro.py -c $config -s $read1 --contig $contig -o $output --tutorial EC
 ```
 
