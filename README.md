@@ -80,15 +80,16 @@ The MetaPro Docker container runs Ubuntu Linux 18.04
 MetaPro's tools may take a long time to run if the user does not have the necessary computing resources.  Therefore, we will provide pre-computed files so that the user is not forced to run the software. 
 
 ```
-wget https://github.com/ParkinsonLab/2017-Microbiome-Workshop/releases/download/Extra/precomputed_files.tar.gz
+wget https://github.com/ParkinsonLab/MetaPro_tutorial/releases/download/1.0/tutorial_files.tar.gz
+tar -xzvf tutorial_files.tar.gz
 ```
-
+ 
 ### Input files
 
 Our data set consists of 150 bp single-end Illumina reads generated from mouse colon contents. To inspect its contents:
 
 ```
-tar -xvf precomputed_files.tar.gz mouse1.fastq
+tar -xvf tutorial_files.tar.gz 
 less mouse1.fastq
 ```
 
@@ -441,8 +442,6 @@ You could use sequence similarity tools such as BWA or BLAST for this step, but 
 Here, MetaPro demonstrates the case for automation.
 MetaPro subdivides the input data, coordinates the concurrent processes, and collects the results into one single file after all of the scanning has been complete.
 
-So we will skip this step and use a precomputed file, `mouse1_rRNA.infernalout`, from the tar file `precomputed_files.tar.gz`.
-
 
 MetaPro will perform the following:
 - subdivide the input data in user-defined chunksizes.
@@ -475,7 +474,7 @@ python3 /pipeline/MetaPro.py -c $config -s $read1 -o $output --tutorial rRNA
 
 instead, we have provided you with the results.
 ``` 
-tar -xzf precomputed_files.tar.gz mouse1_rRNA.infernalout
+tutorial_files/mouse1_run/rRNA_filter/final_results.
 ```
 
 Here, we only remove a few thousand reads than map to rRNA, but in some datasets rRNA may represent up to 80% of the sequenced reads.
@@ -531,6 +530,11 @@ read1=/home/billy/mpro_tutorial/mouse1_run/duplicate_repopulation/final_results/
 config=/home/billy/mpro_tutorial/config_mouse.ini
 output=/home/billy/mpro_tutorial/mouse1_run
 python3 /pipeline/MetaPro.py -c $config -s $read1 -o $output --tutorial contigs
+```
+
+The expected output will be in:
+```
+tutorial_files/mouse1_run/assemble_contigs/final_results
 ```
 
 
@@ -600,6 +604,10 @@ output=/home/billy/mpro_tutorial/mouse1_run
 python3 /pipeline/MetaPro.py -c $config -s $read1 --contig $contig -o $output --tutorial GA
 ```
 
+The outputs are located in:
+```
+tutorial_files/GA_FINAL_MERGE/final_results
+```
 
 
 **Notes**:
@@ -625,14 +633,14 @@ python3 /pipeline/MetaPro.py -c $config -s $read1 --contig $contig -o $output --
         -   If both reads agree on the same gene or protein, the read is counted only once. 
         -   This paired-read conflict resolution is performed in the GA_FINAL_MERGE step.
     
--   Unless you are running this tutorial on a computing cluster, most systems do not have enough memory to handle indexing or searching large databases like `ChocoPhlan` (19GB) and `nr` (>60GB). The descriptions in this section are purely for your information. Please use our precomputed gene, protein, and read mapping files from the tar file `tar -xzf precomputed_files.tar.gz mouse1_genes_map.tsv mouse1_genes.fasta mouse1_proteins.fasta`
+-   Unless you are running this tutorial on a computing cluster, most systems do not have enough memory to handle indexing or searching large databases like `ChocoPhlan` (19GB) and `nr` (>60GB). The descriptions in this section are purely for your information. Please use our precomputed gene, protein, and read mapping files from the tar file `tar -xzf tutorial_files.tar.gz`
 
 ### Step 9. Taxonomic Classification
 
 Now that we have putative mRNA transcripts, we can begin to infer the origins of our mRNA reads. Firstly, we will attempt to use a reference based short read classifier to infer the taxonomic orgin of our reads. Here we will use [Kaiju] (https://github.com/bioinformatics-centre/kaiju), [Centrifuge](https://ccb.jhu.edu/software/centrifuge/manual.shtml), and our Gene Annotation results to generate taxonomic classifications for our reads based on a reference database. 
 Kaiju can classify prokaryotic reads at speeds of millions of reads per minute using the proGenomes database on a system with less than 16GB of RAM (~13GB). Using the entire NCBI nr database as a reference takes ~43GB. Similarly fast classification tools require >100GB of RAM to classify reads against large databases. 
 
-However, Kaiju still takes too much memory for the systems in the workshop so we have precompiled the classifications, `mouse1_classification.tsv`, in the tar file `precomputed_files.tar.gz`.
+However, Kaiju still takes too much memory for the systems in the workshop so we have precompiled the classifications, `mouse1_classification.tsv`, in the tar file `tutorial_files.tar.gz`.
 Centrifuge is a lightweight rapid microbial classification engine.  It uses methods similar to BWA and the Ferrgina-Manzini (FM) index  to make quick work of assigning taxomony.
 
 The ChocoPhlan Pangenome Database contains taxonomic information that MetaPro extracts.  Kaiju, Centrifuge, and the extracted taxa are combined using [WEVOTE](https://github.com/aametwally/WEVOTE).  WEVOTE is the Weighted Voting Taxonomic Identification system.  It performs consensus merging of various taxa results and reconciles the taxa identification from various sources.  
@@ -659,20 +667,17 @@ python3 /pipeline/MetaPro.py -c $config -s $read1 --contig $contig -o $output --
 
 
 Instead, we have provided the results here:
-
 ```
-tar --wildcards -xzf precomputed_files.tar.gz kaiju*
-chmod +x kaiju*
-tar -xzf precomputed_files.tar.gz mouse1_classification.tsv nodes.dmp names.dmp
-
+tutorial_files/mouse1_run/taxonomic_annotation/final_results
 ```
+
 We can use [Krona] (https://github.com/marbl/Krona/wiki) to generate a hierarchical multi-layered pie chart summary of the taxonomic composition of our dataset.
 
 To use Krona, the export of MetaPro's taxonomic annotations need to be appended
 
 ```
-python3 /pipeline/Scripts/alter_taxa_for_krona.py <taxonomic_classifications.tsv> <for_krona.tsv>
-/pipeline_tools/kaiju/kaiju2krona -t nodes.dmp -n names.dmp -i mouse1_classification_genus.tsv -o mouse1_classification_Krona.txt
+python3 /pipeline/Scripts/alter_taxa_for_krona.py tutorial_files/taxonomic_classifications.tsv tutorial_files/mouse1_classification.tsv
+/pipeline_tools/kaiju/kaiju2krona -t nodes.dmp -n names.dmp -i mouse1_classification.tsv -o mouse1_classification_Krona.txt
 /pipeline_tools/KronaTools/scripts/ImportText.pl -o mouse1_classification.html mouse1_classification_Krona.txt
 ```
 
@@ -715,6 +720,11 @@ contig=/home/billy/mpro_tutorial/mouse1_run/assemble_contigs/final_results/conti
 config=/home/billy/mpro_tutorial/config_mouse.ini
 output=/home/billy/mpro_tutorial/mouse1_run
 python3 /pipeline/MetaPro.py -c $config -s $read1 --contig $contig -o $output --tutorial EC
+```
+
+The results are provided in:
+```
+tutorial_files/enzyme_annotation/final_results
 ```
 
 **Notes**:
@@ -815,7 +825,7 @@ You can find other [pathways on KEGG] (http://www.genome.jp/kegg-bin/get_htext?h
 
 **Notes**:
 
--   A cytoscape file with node attributes precalculated is provided for your convenience, `tar -xzf precomputed_files.tar.gz Example.cys`, feel free to open it and play with different visualizations and different layouts - compare the circular layouts with the spring embedded layouts for example. If you want to go back to the original layout then you will have to reload the file.
+-   A cytoscape file with node attributes precalculated is provided for your convenience, `tar -xzf tutorial_files.tar.gz Example.cys`, feel free to open it and play with different visualizations and different layouts - compare the circular layouts with the spring embedded layouts for example. If you want to go back to the original layout then you will have to reload the file.
 -   Cytoscape can be temperamental. If you don't see pie charts for the nodes, they appear as blank circles, you can show these manually. Under the 'properties' panel on the left, there is an entry labeled 'Custom Graphics 1'. Double click the empty box on the left (this is for default behavior) - this will pop up a new window with a choice of 'Images' 'Charts' and 'Gradients' - select 'Charts', choose the chart type you want (pie chart or donut for example) and select the different bacterial taxa by moving them from "Available Columns" to "Selected Columns". Finally click on 'Apply' in bottom right of window (may not be visible until you move the window).
 
 **Visualization Questions:**
