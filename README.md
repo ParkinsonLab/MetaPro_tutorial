@@ -145,8 +145,7 @@ Additionally, a license from MetaGeneMark is required to run to the contig assem
 -   [MetaGeneMark](http://exon.gatech.edu/Genemark/license_download.cgi)
 
 ### Configuration file:
-MetaPro controls many of its features with a Configuration file.  
-a copy has been provided for you in, but it needs to be altered to include the path to the databases.
+MetaPro controls many of its features with a Configuration file, a copy has been provided for you in the precomputed files, but it needs to be altered to include the path to the databases.
 
 
 ```
@@ -298,7 +297,7 @@ While the number of replicated reads in this small dataset is relatively low, wi
 
 ### Step 3. Remove vector contamination
 
-To identify and filter reads from sources of vector, adapter, linker, and primer contamination we the Burrows Wheeler aligner (BWA) and the BLAST-like alignment tool (BLAT) to search against a database of cow sequences. As a reference database for identifying contaminating vector and adapter sequences we rely on the UniVec\_Core dataset which is a fasta file of known vectors and common sequencing adapters, linkers, and PCR Primers derived from the NCBI Univec Database. 
+To identify and filter reads from sources of vector, adapter, linker, and primer contamination we use the Burrows Wheeler aligner (BWA) and the BLAST-like alignment tool (BLAT) to search against a database of cow sequences. As a reference database for identifying contaminating vector and adapter sequences we rely on the UniVec\_Core dataset which is a fasta file of known vectors and common sequencing adapters, linkers, and PCR Primers derived from the NCBI Univec Database. 
 
 Now we call MetaPro to perform the vector filtering
 ```
