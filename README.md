@@ -779,6 +779,10 @@ python3 /pipeline/MetaPro.py -c $config -s $read1 --contig $contig -o $output --
 ### Step 12. Visualize the results using a KEGG Pathway as a scaffold in Cytoscape.
 
 To visualize our processed microbiome dataset in the context of the carbohydrate metabolism pathways, we use the network visualization tool - Cytoscape together with the enhancedGraphics and KEGGscape plugins. Some useful commands for loading in networks, node attributes and changing visual properties are provided below (there are many cytoscape tutorials available online).
+Note: Use cytoscape 3.7.2, instead of the latest version
+```
+https://github.com/cytoscape/cytoscape/releases/3.7.2/
+```
 
 
 **Download the metabolic pathway**
@@ -786,8 +790,8 @@ To visualize our processed microbiome dataset in the context of the carbohydrate
 First, download the carbohydrate metabolism pathways from KEGG using the following commands:
 
 ```
-wget https://github.com/ParkinsonLab/2017-Microbiome-Workshop/releases/download/EC/ec00010.xml
-wget https://github.com/ParkinsonLab/2017-Microbiome-Workshop/releases/download/EC/ec00500.xml
+wget https://github.com/ParkinsonLab/Metatranscriptome-Workshop/releases/download/EC/ec00010.xml
+wget https://github.com/ParkinsonLab/Metatranscriptome-Workshop/releases/download/EC/ec00500.xml
 ```
 
 You can find other [pathways on KEGG] (http://www.genome.jp/kegg-bin/get_htext?htext=br08901.keg) which can also be imported into Cytoscape by selecting the `Download KGML` option on the top of the page for each pathway.
