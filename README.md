@@ -66,7 +66,7 @@ docker run -it -v <a folder in your directory>:<an equivalent folder to mount to
 
 an example would be:
 ```
-docker run -it -v C:\Users\Billy\Documents\MetaPro_tutorial:/MetaPro_docker_tutorial parkinsonlab/metapro:tutorial
+docker run -it -v C:\Users\Billy\Documents\MetaPro_tutorial:/MetaPro_docker_tutorial parkinsonlab/metapro:develop
 ```
 
 an equivalent singularity command would be:
