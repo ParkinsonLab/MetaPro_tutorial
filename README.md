@@ -46,11 +46,11 @@ https://www.docker.com/products/docker-desktop
 If you are running the tutorial on a computing cluster environment, your admin may already have Singularity installed.  For the purposes of this tutorial, Docker is equivalent to Singularity.
 Next, pull the MetaPro docker image
 ```
-docker pull parkinsonlab/metapro:develop
+docker pull parkinsonlab/metapro:2.1.1
 ```
 OR
 ```
-singularity pull docker://parkinsonlab/metapro:develop
+singularity pull docker://parkinsonlab/metapro:2.1.1
 ```
 
 Docker and Singularity maintain different access modes to use their containers.  
@@ -66,7 +66,7 @@ docker run -it -v <a folder in your directory>:<an equivalent folder to mount to
 
 an example would be:
 ```
-docker run -it -v C:\Users\Billy\Documents\MetaPro_tutorial:/MetaPro_docker_tutorial parkinsonlab/metapro:develop
+docker run -it -v C:\Users\Billy\Documents\MetaPro_tutorial:/MetaPro_docker_tutorial parkinsonlab/metapro:2.1.1
 ```
 
 an equivalent singularity command would be:
